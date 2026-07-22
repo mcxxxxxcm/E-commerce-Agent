@@ -1,0 +1,216 @@
+version: "3.9"
+
+services:
+  # ============================================
+  # 基础设施
+  # ============================================
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: agent-cluster-postgres
+    environment:
+      POSTGRES_DB: agent_cluster
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: change-me-in-production
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent -d agent_cluster"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: agent-cluster-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # 代理层
+  # ============================================
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.agent
+    container_name: agent-gateway
+    command: uvicorn services.gateway.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      SERVICE_NAME: gateway
+    env_file:
+      - ../.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ============================================
+  # 编排层
+  # ============================================
+
+  supervisor:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.agent
+    container_name: agent-supervisor
+    command: uvicorn services.supervisor.main:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    environment:
+      SERVICE_NAME: supervisor
+    env_file:
+      - ../.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ============================================
+  # Agent 层
+  # ============================================
+
+  telemarketing:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.agent
+    container_name: agent-telemarketing
+    command: uvicorn services.telemarketing.main:app --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
+    environment:
+      SERVICE_NAME: telemarketing
+    env_file:
+      - ../.env
+    depends_on:
+      - postgres
+      - redis
+
+  live:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.agent
+    container_name: agent-live
+    command: uvicorn services.live.main:app --host 0.0.0.0 --port 8003
+    ports:
+      - "8003:8003"
+    environment:
+      SERVICE_NAME: live
+    env_file:
+      - ../.env
+    depends_on:
+      - postgres
+      - redis
+
+  customer-service:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.agent
+    container_name: agent-cs
+    command: uvicorn services.customer-service.main:app --host 0.0.0.0 --port 8004
+    ports:
+      - "8004:8004"
+    environment:
+      SERVICE_NAME: customer-service
+    env_file:
+      - ../.env
+    depends_on:
+      - postgres
+      - redis
+
+  operations:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.operations
+    container_name: agent-operations
+    command: uvicorn services.operations.main:app --host 0.0.0.0 --port 8005
+    ports:
+      - "8005:8005"
+    environment:
+      SERVICE_NAME: operations
+    env_file:
+      - ../.env
+    depends_on:
+      - postgres
+      - redis
+
+  content:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.agent
+    container_name: agent-content
+    command: uvicorn services.content.main:app --host 0.0.0.0 --port 8006
+    ports:
+      - "8006:8006"
+    environment:
+      SERVICE_NAME: content
+    env_file:
+      - ../.env
+    depends_on:
+      - postgres
+      - redis
+
+  office:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.agent
+    container_name: agent-office
+    command: uvicorn services.office.main:app --host 0.0.0.0 --port 8007
+    ports:
+      - "8007:8007"
+    environment:
+      SERVICE_NAME: office
+    env_file:
+      - ../.env
+    depends_on:
+      - postgres
+      - redis
+
+  # ============================================
+  # 可观测性
+  # ============================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: agent-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: agent-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: agent-jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+
+volumes:
+  pgdata:
+  redisdata:
+  grafana-data:

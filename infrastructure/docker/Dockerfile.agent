@@ -1,0 +1,33 @@
+# Agent 通用 Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# 系统依赖
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 依赖
+COPY pyproject.toml .
+RUN pip install --no-cache-dir -e . 2>/dev/null || pip install --no-cache-dir \
+    fastapi uvicorn[standard] langgraph langchain langchain-openai \
+    langchain-anthropic redis sqlalchemy asyncpg pgvector psycopg2-binary \
+    alembic pydantic pydantic-settings structlog httpx openai anthropic \
+    litellm chromadb apscheduler python-jose passlib prometheus-client \
+    opentelemetry-api opentelemetry-sdk opentelemetry-instrumentation-fastapi \
+    opentelemetry-exporter-otlp tenacity python-multipart
+
+# 安装共享包
+COPY shared/ ./shared/
+RUN pip install -e ./shared/
+
+# 复制服务代码
+COPY services/ ./services/
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+
+CMD ["uvicorn", "services.gateway.main:app", "--host", "0.0.0.0", "--port", "8000"]

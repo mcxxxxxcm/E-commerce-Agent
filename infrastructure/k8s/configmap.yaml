@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-cluster-config
+  namespace: agent-cluster
+data:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  POSTGRES_HOST: "postgres.agent-cluster.svc.cluster.local"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "agent_cluster"
+  REDIS_HOST: "redis.agent-cluster.svc.cluster.local"
+  REDIS_PORT: "6379"
+  GATEWAY_PORT: "8000"
+  GATEWAY_WORKERS: "4"
+  DEFAULT_MODEL: "claude-sonnet-4-6"
+  FAST_MODEL: "claude-haiku-4-5"
+  EMBEDDING_MODEL: "text-embedding-3-small"
+  EMBEDDING_DIMENSION: "1536"
+  SUPERVISOR_URL: "http://supervisor:8001"
+  TELEMARKETING_URL: "http://telemarketing:8002"
+  LIVE_URL: "http://live:8003"
+  CUSTOMER_SERVICE_URL: "http://customer-service:8004"
+  OPERATIONS_URL: "http://operations:8005"
+  CONTENT_URL: "http://content:8006"
+  OFFICE_URL: "http://office:8007"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"

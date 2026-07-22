@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agent-cluster
+  labels:
+    app: agent-cluster
+    env: production

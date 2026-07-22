@@ -1,0 +1,46 @@
+{
+  "dashboard": {
+    "title": "Agent Cluster Overview",
+    "panels": [
+      {
+        "title": "Gateway Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(gateway_requests_total[5m])",
+            "legendFormat": "{{agent}} - {{method}}"
+          }
+        ]
+      },
+      {
+        "title": "Request Latency (P95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(gateway_request_latency_seconds_bucket[5m]))",
+            "legendFormat": "{{agent}}"
+          }
+        ]
+      },
+      {
+        "title": "Agent Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=~\"gateway|agents\"}"
+          }
+        ]
+      },
+      {
+        "title": "Task Status Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "agent_tasks_total",
+            "legendFormat": "{{status}}"
+          }
+        ]
+      }
+    ]
+  }
+}
