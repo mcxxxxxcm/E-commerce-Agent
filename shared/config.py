@@ -72,6 +72,12 @@ class Settings(BaseSettings):
     operations_url: str = "http://localhost:8005"
     content_url: str = "http://localhost:8006"
     office_url: str = "http://localhost:8007"
+    product_display_url: str = "http://localhost:8008"
+
+    # --- 图像生成 ---
+    image_gen_provider: Literal["dalle", "stability"] = "dalle"
+    image_gen_model: str = "dall-e-3"
+    image_storage_path: str = "./data/product-images"
 
     # --- 可观测性 ---
     otel_exporter_otlp_endpoint: str = "http://localhost:4317"
@@ -96,6 +102,7 @@ class Settings(BaseSettings):
             "operations": self.operations_url,
             "content": self.content_url,
             "office": self.office_url,
+            "product_display": self.product_display_url,
         }
 
 

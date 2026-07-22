@@ -123,6 +123,7 @@ AGENT_TOOL_TAGS: dict[str, list[str]] = {
     "operations": ["analytics", "product", "crm", "competitor", "report"],
     "content": ["content", "platform", "knowledge", "product"],
     "office": ["oa", "document", "notification", "approval"],
+    "product_display": ["product", "content", "platform", "image"],
 }
 
 

@@ -37,6 +37,10 @@ class EventType(StrEnum):
     TASK_COMPLETED = "task.completed"
     TASK_FAILED = "task.failed"
 
+    # --- 商品展示图 ---
+    PRODUCT_DISPLAY_GENERATED = "product.display_generated"
+    PRODUCT_DISPLAY_REVIEW_NEEDED = "product.display_review_needed"
+
     # --- 知识库 ---
     KNOWLEDGE_UPDATED = "knowledge.updated"
     KNOWLEDGE_RETRIEVED = "knowledge.retrieved"

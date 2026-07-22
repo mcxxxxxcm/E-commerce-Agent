@@ -66,6 +66,8 @@ TASK_ROUTING: dict[str, list[str]] = {
     "promotion_campaign": ["operations", "content", "customer_service"],
     "high_intent_lead": ["customer_service", "telemarketing"],
     "content_to_live": ["content", "live"],
+    "product_display_generation": ["product_display"],
+    "product_to_content": ["product_display", "content"],
 }
 
 

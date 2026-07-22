@@ -24,4 +24,5 @@ data:
   OPERATIONS_URL: "http://operations:8005"
   CONTENT_URL: "http://content:8006"
   OFFICE_URL: "http://office:8007"
+  PRODUCT_DISPLAY_URL: "http://product-display:8008"
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"

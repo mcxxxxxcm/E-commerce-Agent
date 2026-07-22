@@ -22,6 +22,7 @@ ROUTE_MAP = {
     "/operations": settings.operations_url,
     "/content": settings.content_url,
     "/office": settings.office_url,
+    "/product-display": settings.product_display_url,
 }
 
 

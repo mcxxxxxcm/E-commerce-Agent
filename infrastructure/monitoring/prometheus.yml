@@ -20,6 +20,7 @@ scrape_configs:
           - "operations:8005"
           - "content:8006"
           - "office:8007"
+          - "product-display:8008"
 
   - job_name: "redis"
     static_configs:
